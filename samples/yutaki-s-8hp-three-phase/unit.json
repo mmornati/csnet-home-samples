@@ -1,0 +1,13 @@
+{
+  "name": "Yutaki S 8 HP, three phase",
+  "model": "Yutaki S (split, R32), one indoor unit",
+  "capacity_hp": 8,
+  "power_supply": "three_phase",
+  "suction_sensor": false,
+  "dhw": false,
+  "zones": 2,
+  "meter": "Shelly Pro 3EM on the heat pump circuit (also feeds the CSNet and thermostat boxes, about 100 W)",
+  "country": "FR",
+  "contributor": "mmornati",
+  "notes": "Heating only. Two water circuits: C1 points curve, C2 gradient curve. No DHW tank, no pool, no known backup heater in use. CSNet reports heat (whole kWh per hour) but no electricity (no pulse meter)."
+}

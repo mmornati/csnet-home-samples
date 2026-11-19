@@ -1,0 +1,61 @@
+name: Share a sample
+description: Send a recording of your unit so changes to CSNet Home can be tested against it.
+title: "Sample: <model>, <single/three phase>"
+labels: ["sample"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Record with the action **CSNet Home: Start sample recording** (2 days or more), then attach the
+        `.jsonl.gz` file from the `csnet_home_samples` folder of your Home Assistant configuration below.
+        Please read [what a sample contains](https://github.com/mmornati/csnet-home-samples#privacy) first.
+  - type: input
+    id: model
+    attributes:
+      label: Unit model
+      description: As on the unit's label or in CSNet Manager.
+      placeholder: Yutaki S 6 HP, Yutaki S80, Yutaki M...
+    validations:
+      required: true
+  - type: dropdown
+    id: power_supply
+    attributes:
+      label: Power supply
+      options: ["Single phase", "Three phase", "I don't know"]
+    validations:
+      required: true
+  - type: checkboxes
+    id: equipment
+    attributes:
+      label: Equipment
+      options:
+        - label: DHW tank
+        - label: Two circuits (C1 and C2)
+        - label: Cooling used during the recording
+        - label: Swimming pool
+        - label: Backup heater or boiler in use
+  - type: textarea
+    id: meter
+    attributes:
+      label: Meter
+      description: If a meter was recorded, which one and what else is on its circuit.
+      placeholder: Shelly EM on the heat pump's breaker only.
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything worth knowing
+      description: Holidays, a defrost-heavy day, a setting changed during the recording...
+  - type: textarea
+    id: file
+    attributes:
+      label: Sample file
+      description: Drag the .jsonl.gz file here (GitHub accepts files up to 25 MB).
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Sharing
+      options:
+        - label: I agree to publish this sample under CC0 (public domain), and I checked it contains nothing I want to keep private.
+          required: true

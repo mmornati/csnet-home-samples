@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSNet Home samples</title>
+<meta name="description" content="Recorded data of real Hitachi heat pumps, to test changes to the CSNet Home integration against them.">
+<style>
+:root {
+  --bg: #fbfbf9; --surface: #ffffff; --text: #1d1f21; --muted: #5f6368; --line: #e3e3de;
+  --accent: #0b6e69; --accent-soft: #e2f1ef; --warn: #9a5b00; --chip: #f0f0ec;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141516; --surface: #1c1d1f; --text: #e8e8e6; --muted: #a0a3a6; --line: #2e3033;
+    --accent: #5cc2b9; --accent-soft: #173431; --warn: #e2a64a; --chip: #26282b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141516; --surface: #1c1d1f; --text: #e8e8e6; --muted: #a0a3a6; --line: #2e3033;
+  --accent: #5cc2b9; --accent-soft: #173431; --warn: #e2a64a; --chip: #26282b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-size: 1.7rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 1.1rem; margin: 40px 0 10px; }
+p { margin: 0 0 12px; max-width: 72ch; }
+a { color: var(--accent); }
+.lead { color: var(--muted); font-size: 1.02rem; }
+code, pre { font: 0.86rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+pre { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; margin: 0 0 12px; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; margin: 24px 0 14px; }
+.filters label { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--muted); gap: 4px; }
+.filters input, .filters select { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; min-width: 150px; }
+.count { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 860px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600; background: var(--surface); position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.unit-name { font-weight: 600; }
+.sub { color: var(--muted); font-size: 0.83rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.chip { background: var(--chip); border-radius: 999px; padding: 1px 8px; font-size: 0.75rem; white-space: nowrap; }
+.chip.rec { background: var(--accent-soft); color: var(--accent); }
+.chip.hist { color: var(--warn); }
+.dl { white-space: nowrap; font-weight: 600; }
+.empty { padding: 28px; text-align: center; color: var(--muted); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+.card h3 { margin: 0 0 8px; font-size: 1rem; }
+.card p, .card li { font-size: 0.93rem; }
+.card ul { margin: 0; padding-left: 18px; }
+footer { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>CSNet Home samples</h1>
+  <p class="lead">Recorded data of real Hitachi heat pumps: what CSNet Manager sent, poll by poll. Developers of the <a href="https://github.com/mmornati/home-assistant-csnet-home">CSNet Home integration</a> replay them to see what a change would show on each unit before it ships.</p>
+
+  <div class="filters">
+    <label>Search<input id="q" type="search" placeholder="model, notes…"></label>
+    <label>Power supply<select id="phase"><option value="">Any</option><option value="single_phase">Single phase</option><option value="three_phase">Three phase</option></select></label>
+    <label>Meter<select id="meter"><option value="">Any</option><option value="yes">With a meter</option><option value="no">Without</option></select></label>
+    <label>Conditions<select id="cond"><option value="">Any</option><option value="defrost">With defrosts</option><option value="cool">Cooling</option><option value="dhw">DHW tank</option></select></label>
+    <label>Source<select id="source"><option value="">Any</option><option value="recorder">Recorded</option><option value="ha-history">Rebuilt from history</option></select></label>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Unit</th><th>Period</th><th>Outdoor °C</th><th>Running</th><th>Meter</th><th>CSNet heat</th><th>Download</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>Use them</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Replay them in the integration's tests</h3>
+      <p>From a checkout of the integration:</p>
+      <pre>python scripts/fetch_samples.py --meter
+pytest -m replay</pre>
+      <p class="sub">Filters: <code>--unit</code>, <code>--power-supply</code>, <code>--meter</code>, <code>--defrost</code>, <code>--all</code>. Files go to <code>tests/samples/</code>.</p>
+    </div>
+    <div class="card">
+      <h3>Compare two branches</h3>
+      <pre>CSNET_REPLAY_REPORT=head.json pytest -m replay
+git switch main
+CSNET_REPLAY_REPORT=base.json pytest -m replay
+python -m tests.replay.report base.json head.json</pre>
+      <p class="sub">Prints each day's electricity, heat and COP before → after, next to the meter and CSNet's own heat.</p>
+    </div>
+    <div class="card">
+      <h3>The file format</h3>
+      <p>A gzip JSON Lines file. The first line is a header; every other line is one reply of CSNet Manager, redacted like the diagnostics download, or a meter reading:</p>
+      <pre>{"t": 61.2, "kind": "installation_devices", "data": {…}}
+{"t": 61.2, "kind": "meter", "energy_kwh": 1234.5, "power_w": 1830}</pre>
+    </div>
+  </div>
+
+  <h2>Share your unit</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>1. Record</h3>
+      <p>In Home Assistant, run the action <b>CSNet Home: Start sample recording</b> (2 days or more). Pick your meter's power sensor if you have one. The file lands in <code>csnet_home_samples/</code> of your configuration folder.</p>
+    </div>
+    <div class="card">
+      <h3>2. Check</h3>
+      <p>Names, position, account and serial numbers are removed, but the replies keep your zone names, dates and times. Read <a href="https://github.com/mmornati/csnet-home-samples#privacy">what a sample contains</a> before sharing it.</p>
+    </div>
+    <div class="card">
+      <h3>3. Send it</h3>
+      <p>Open a <a href="https://github.com/mmornati/csnet-home-samples/issues/new?template=share-sample.yml">Share a sample</a> issue and attach the file, or open a pull request adding it under <code>samples/&lt;your-unit&gt;/</code>. Samples are shared under CC0.</p>
+    </div>
+  </div>
+
+  <footer>Not affiliated with Hitachi. <a href="https://github.com/mmornati/csnet-home-samples">Repository</a> · <a href="index.json">index.json</a> · <span id="generated"></span></footer>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const fmt = (v, d = 1) => (v === null || v === undefined ? "–" : Number(v).toFixed(d));
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const day = (iso) => new Date(iso.slice(0, 16)).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+let samples = [];
+
+function row(s) {
+  const u = s.unit_info || {};
+  const phase = { single_phase: "single phase", three_phase: "three phase" }[u.power_supply] || u.power_supply || "";
+  const chips = [
+    `<span class="chip ${s.source === "recorder" ? "rec" : "hist"}">${s.source === "recorder" ? "recorded" : "rebuilt from history"}</span>`,
+    phase && `<span class="chip">${esc(phase)}</span>`,
+    u.suction_sensor === false ? `<span class="chip">no suction sensor</span>` : "",
+    u.dhw ? `<span class="chip">DHW</span>` : "",
+    u.zones ? `<span class="chip">${u.zones} zone${u.zones > 1 ? "s" : ""}</span>` : "",
+    s.defrosts ? `<span class="chip">${s.defrosts} defrost${s.defrosts > 1 ? "s" : ""}</span>` : "",
+    ...(s.modes || []).filter((m) => m !== "heat").map((m) => `<span class="chip">${esc(m)}</span>`),
+  ].filter(Boolean).join("");
+  return `<tr>
+    <td><div class="unit-name">${esc(u.name || s.unit)}</div><div class="sub">${esc(u.model || "")}${u.capacity_hp ? ` · ${u.capacity_hp} HP` : ""}</div><div class="chips">${chips}</div>${s.notes ? `<div class="sub" style="margin-top:6px">${esc(s.notes)}</div>` : ""}</td>
+    <td class="num">${day(s.start)}<div class="sub">${s.days >= 1 ? fmt(s.days, 1) + " days" : Math.round(s.days * 1440) + " min"} · ${s.polls} polls</div></td>
+    <td class="num">${fmt(s.outdoor_min, 0)} / ${fmt(s.outdoor_mean, 1)} / ${fmt(s.outdoor_max, 0)}<div class="sub">min / mean / max</div></td>
+    <td class="num">${fmt(s.running_hours, 1)} h<div class="sub">${s.compressor_starts} start${s.compressor_starts === 1 ? "" : "s"} · max ${s.max_hz} Hz</div></td>
+    <td class="num">${s.meter_kwh === null ? "–" : fmt(s.meter_kwh, 1) + " kWh"}<div class="sub">${s.meter_kwh === null ? "no meter" : s.meter_power ? "energy + power" : "energy"}</div></td>
+    <td class="num">${s.csnet_heat_kwh === null ? "–" : fmt(s.csnet_heat_kwh, 0) + " kWh"}</td>
+    <td><a class="dl" href="${esc(s.url)}" download>${(s.size_bytes / 1e6).toFixed(1)} MB</a><div class="sub">${esc(s.file.split("/").pop())}</div></td>
+  </tr>`;
+}
+
+function render() {
+  const q = $("q").value.trim().toLowerCase();
+  const phase = $("phase").value, meter = $("meter").value, cond = $("cond").value, source = $("source").value;
+  const shown = samples.filter((s) => {
+    const u = s.unit_info || {};
+    if (q && !JSON.stringify([u, s.notes, s.unit]).toLowerCase().includes(q)) return false;
+    if (phase && u.power_supply !== phase) return false;
+    if (meter === "yes" && s.meter_kwh === null) return false;
+    if (meter === "no" && s.meter_kwh !== null) return false;
+    if (cond === "defrost" && !s.defrosts) return false;
+    if (cond === "cool" && !(s.modes || []).includes("cool")) return false;
+    if (cond === "dhw" && !u.dhw) return false;
+    if (source && s.source !== source) return false;
+    return true;
+  });
+  $("rows").innerHTML = shown.length ? shown.map(row).join("") : `<tr><td colspan="7" class="empty">No sample matches these filters.</td></tr>`;
+  $("count").textContent = `${shown.length} of ${samples.length} samples`;
+}
+
+fetch("index.json")
+  .then((r) => r.json())
+  .then((index) => {
+    samples = index.samples.sort((a, b) => (a.unit + a.start).localeCompare(b.unit + b.start));
+    $("generated").textContent = "Updated " + new Date(index.generated).toLocaleDateString();
+    ["q", "phase", "meter", "cond", "source"].forEach((id) => $(id).addEventListener("input", render));
+    render();
+  })
+  .catch(() => { $("rows").innerHTML = `<tr><td colspan="7" class="empty">Could not load index.json.</td></tr>`; });
+</script>
+</body>
+</html>

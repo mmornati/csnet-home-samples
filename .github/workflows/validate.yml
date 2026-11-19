@@ -1,0 +1,22 @@
+name: Validate samples
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Check the format and that nothing private is left
+        run: python tools/sample_tool.py validate
+      - name: Build the catalog
+        run: python tools/sample_tool.py index
