@@ -220,13 +220,44 @@ def all_samples() -> list[Path]:
     return sorted(SAMPLES.glob("*/*.jsonl.gz"))
 
 
+UNIT_TYPES = {
+    "name": str,
+    "model": str,
+    "capacity_hp": (int, float),
+    "power_supply": str,
+    "suction_sensor": bool,
+    "dhw": bool,
+    "zones": int,
+    "meter": str,
+    "country": str,
+    "contributor": str,
+    "notes": str,
+}
+POWER_SUPPLIES = {"single_phase", "three_phase", "unknown"}
+
+
+def validate_unit(data: Any) -> list[str]:
+    """Return what is wrong with a unit.json."""
+    if not isinstance(data, dict):
+        return ["not a JSON object"]
+    problems = [f"missing {field}" for field in sorted(UNIT_FIELDS - set(data) - {"country"})]
+    for field, value in data.items():
+        expected = UNIT_TYPES.get(field)
+        if expected is None:
+            problems.append(f"unknown field {field}")
+        elif not isinstance(value, expected) or (expected is int and isinstance(value, bool)):
+            problems.append(f"{field} has the wrong type")
+    if data.get("power_supply") not in POWER_SUPPLIES:
+        problems.append(f"power_supply must be one of {', '.join(sorted(POWER_SUPPLIES))}")
+    return problems
+
+
 def cmd_validate(files: list[str]) -> int:
     paths = [Path(f) for f in files] or all_samples()
     failed = False
     for unit, data in units().items():
-        missing = UNIT_FIELDS - set(data) - {"country"}
-        if missing:
-            print(f"samples/{unit}/unit.json: missing {', '.join(sorted(missing))}")
+        for problem in validate_unit(data):
+            print(f"samples/{unit}/unit.json: {problem}")
             failed = True
     for path in paths:
         if path.name.endswith(".jsonl.gz") and not (path.parent / "unit.json").exists():
