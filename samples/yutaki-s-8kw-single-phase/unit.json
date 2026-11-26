@@ -1,0 +1,13 @@
+{
+  "name": "Yutaki S 8 kW, single phase",
+  "model": "Yutaki S (split), one indoor unit",
+  "capacity_hp": 3,
+  "power_supply": "single_phase",
+  "suction_sensor": true,
+  "dhw": false,
+  "zones": 1,
+  "meter": "Tongou Zigbee DIN-rail meter (1-63 A), power only (no energy counter recorded)",
+  "country": "FR",
+  "contributor": "Bamie59",
+  "notes": "Heating only on one water circuit (C1, fixed water temperature). The owner has a DHW tank, but DHW is off in CSNet during the recording and no tank probe is reported. Model given by the owner as 8 kW, taken as the 3 HP unit. Electric backup heater reported by the owner on 22 Nov at 08:58-10:05, 10:38-10:48 and 11:25-11:59 (local time), to be taken with caution: the readings were in error at the time. CSNet reports heat and electricity pulses."
+}
