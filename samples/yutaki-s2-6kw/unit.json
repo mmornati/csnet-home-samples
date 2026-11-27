@@ -1,0 +1,13 @@
+{
+  "name": "Yutaki S 2.0 HP 6 kW, single phase",
+  "model": "Yutaki S (split), one indoor unit with integrated 220 l DHW tank",
+  "capacity_hp": 2,
+  "power_supply": "single_phase",
+  "suction_sensor": true,
+  "dhw": true,
+  "zones": 2,
+  "meter": "Shelly EM with a single clamp around both indoor and outdoor unit supply cables (measures the whole heat pump)",
+  "country": "ES",
+  "contributor": "davigar1391",
+  "notes": "Split (bibloc) unit. Heating on two underfloor heating circuits (C1 with points OTC curve, C2). DHW from the integrated 220 l tank. The unit is oversized and cannot supply water below 32 C, so it spends many hours at minimum frequency (about 31 Hz). Samples rebuilt from Home Assistant history with tools/history_to_sample.py (template: csnet-sample-20261124-2234.jsonl.gz)."
+}
